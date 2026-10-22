@@ -18,7 +18,7 @@ export default function LoginPage() {
     try {
       const res = await fetch("/api/login", {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
           "Accept": "application/json"
         },
@@ -30,10 +30,9 @@ export default function LoginPage() {
 
       if (data.status === 200 && data.token) {
         setIsSuccess(true);
-        // Save token for 7 days
+        // Save JWT token in cookie for 7 days
         document.cookie = `auth_token=${data.token}; path=/; max-age=${60 * 60 * 24 * 7}`;
-        
-        // Brief delay so the user sees the success message before redirecting
+
         setTimeout(() => {
           window.location.href = "/panel";
         }, 1000);
@@ -49,7 +48,7 @@ export default function LoginPage() {
   return (
     <>
       <h1>Admin Login</h1>
-      
+
       <form className="login-form" onSubmit={handleSubmit}>
         <input
           type="text"
