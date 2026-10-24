@@ -47,6 +47,7 @@ export default function PanelPage() {
                 <li><Link href="/users">Users</Link></li>
                 <li><Link href="/server">Server</Link></li>
                 <li><Link href="/statistics">Statistics</Link></li>
+                <li><Link href="/invitation_codes">Invitation Codes</Link></li>
             </ul>
 
             <button onClick={handleLogout} className="logout-btn">Logout</button>
