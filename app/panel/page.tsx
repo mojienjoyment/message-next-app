@@ -14,26 +14,15 @@ export default function PanelPage() {
 
     useEffect(() => {
         const token = getCookie("auth_token");
-        if (!token) {
-            window.location.href = "/";
-            return;
-        }
+        if (!token) { window.location.href = "/"; return; }
 
         fetch("/api/user/me", {
             method: "GET",
             headers: { "Authorization": `Bearer ${token}` }
         })
-            .then((res) => {
-                if (!res.ok) throw new Error("Unauthorized");
-                return res.json();
-            })
-            .then((data) => {
-                setUser(data.user);
-                setLoading(false);
-            })
-            .catch(() => {
-                window.location.href = "/";
-            });
+            .then((res) => { if (!res.ok) throw new Error("Unauthorized"); return res.json(); })
+            .then((data) => { setUser(data.user); setLoading(false); })
+            .catch(() => { window.location.href = "/"; });
     }, []);
 
     const handleLogout = () => {
@@ -45,40 +34,22 @@ export default function PanelPage() {
     if (!user) return null;
 
     return (
-        <>
+        <div className="dash-card">
             <h1>Dashboard</h1>
-            <p className="welcome-text">Welcome, {user.username}!</p>
+            <p style={{ fontSize: "1.1rem", color: "var(--muted)" }}>Welcome, {user.username}!</p>
 
-            <div style={{
-                textAlign: "left",
-                background: "#f9fafb",
-                padding: "24px",
-                borderRadius: "12px",
-                marginBottom: "24px",
-                border: "1px solid #e5e7eb"
-            }}>
-                <p style={{ margin: "12px 0", color: "#1f2937" }}>
-                    <strong style={{ color: "#4f46e5", minWidth: "120px", display: "inline-block" }}>Username:</strong>
-                    {user.username}
-                </p>
-                <p style={{ margin: "12px 0", color: "#1f2937" }}>
-                    <strong style={{ color: "#4f46e5", minWidth: "120px", display: "inline-block" }}>Email:</strong>
-                    {user.email}
-                </p>
+            <div className="info-card">
+                <p className="info-row"><span className="info-label">Username:</span> {user.username}</p>
+                <p className="info-row"><span className="info-label">Email:</span> {user.email}</p>
             </div>
 
-            {/* Navigation Menu */}
-            <nav>
-                <ul>
-                    <li><Link href="/users">users</Link></li>
-                    <li><Link href="/server">server</Link></li>
-                    <li><Link href="/statistics">statistics</Link></li>
-                </ul>
-            </nav>
+            <ul className="nav-pills">
+                <li><Link href="/users">Users</Link></li>
+                <li><Link href="/server">Server</Link></li>
+                <li><Link href="/statistics">Statistics</Link></li>
+            </ul>
 
-            <button onClick={handleLogout} className="logout-btn" style={{ marginTop: "24px" }}>
-                Logout
-            </button>
-        </>
+            <button onClick={handleLogout} className="logout-btn">Logout</button>
+        </div>
     );
 }

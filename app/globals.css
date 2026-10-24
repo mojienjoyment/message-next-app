@@ -31,19 +31,16 @@ body {
   color: var(--text);
   line-height: 1.6;
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
+/* Root wrapper — NO card styling here. Let pages decide. */
 #root {
   width: 100%;
-  max-width: 420px;
-  padding: 32px 24px;
-  background: var(--surface);
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.08);
-  text-align: center;
+  min-height: 100vh;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 h1 {
@@ -58,6 +55,39 @@ p {
   color: var(--muted);
 }
 
+/* ---------- Login card (used only by login page) ---------- */
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 32px 24px;
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.08);
+  text-align: center;
+}
+
+/* ---------- Dashboard card ---------- */
+.dash-card {
+  width: 100%;
+  max-width: 560px;
+  padding: 40px 32px;
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.08);
+  text-align: center;
+}
+
+/* ---------- Wide container (tables) ---------- */
+.wide-container {
+  width: 100%;
+  max-width: 1100px;
+  background: var(--surface);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(17, 24, 39, 0.08);
+  padding: 32px;
+}
+
+/* ---------- Forms ---------- */
 .login-form {
   display: flex;
   flex-direction: column;
@@ -127,26 +157,184 @@ p {
   border: 1px solid #fca5a5;
 }
 
-.welcome-text {
-  font-size: 1.4rem;
-  color: var(--heading);
-  margin-bottom: 24px;
+/* ---------- Dashboard info card ---------- */
+.info-card {
+  background: #f9fafb;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: left;
+  margin: 24px 0;
+}
+
+.info-row {
+  margin: 12px 0;
+  color: var(--text);
+}
+
+.info-label {
+  color: var(--primary);
+  font-weight: 600;
+  min-width: 120px;
+  display: inline-block;
+}
+
+/* ---------- Navigation (pill buttons) ---------- */
+.nav-pills {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 24px 0;
+  padding: 0;
+}
+
+.nav-pills a {
+  display: inline-block;
+  padding: 10px 24px;
+  background: var(--primary);
+  color: #ffffff;
+  border-radius: 10px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s ease, transform 0.1s ease;
+}
+
+.nav-pills a:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+/* ---------- Buttons ---------- */
+.btn {
+  padding: 8px 18px;
+  border: 1px solid var(--border);
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  color: #374151;
+}
+
+.btn:hover {
+  background: #f1f5f9;
+  border-color: #94a3b8;
+}
+
+.btn-danger {
+  border-color: #fecaca;
+  color: #dc2626;
+}
+
+.btn-danger:hover {
+  background: #fee2e2;
+  border-color: #f87171;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 12px 32px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  border-radius: 10px;
+  text-decoration: none;
+  display: inline-block;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
 }
 
 .logout-btn {
   background: var(--surface);
   border: 1px solid var(--border);
   color: var(--muted);
-  padding: 8px 20px;
-  border-radius: 8px;
+  padding: 10px 24px;
+  border-radius: 10px;
   font: inherit;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s ease;
+  margin-top: 16px;
 }
 
 .logout-btn:hover {
-  background: #f3f4f6;
+  background: var(--error-bg);
   color: var(--error-text);
   border-color: var(--error-text);
+}
+
+/* ---------- Table ---------- */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  font-size: 0.95rem;
+}
+
+.data-table th {
+  background: #f8fafc;
+  color: #475569;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 16px 20px;
+  text-align: left;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.data-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #334155;
+  vertical-align: middle;
+}
+
+.data-table tbody tr:hover {
+  background: #f0f4ff;
+}
+
+/* ---------- Badges ---------- */
+.badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge-username {
+  background: #eef2ff;
+  color: #4338ca;
+}
+
+.badge-admin {
+  background: var(--success-bg);
+  color: var(--success-text);
+}
+
+.badge-user {
+  background: var(--error-bg);
+  color: var(--error-text);
+}
+
+/* ---------- Back link ---------- */
+.back {
+  display: inline-block;
+  margin-top: 24px;
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.back:hover {
+  text-decoration: underline;
 }

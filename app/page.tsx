@@ -18,24 +18,16 @@ export default function LoginPage() {
     try {
       const res = await fetch("/api/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
+        headers: { "Content-Type": "application/json", "Accept": "application/json" },
         body: JSON.stringify({ username, password }),
       });
-
       const data = await res.json();
       setMessage(data.msg || "Unknown response");
 
       if (data.status === 200 && data.token) {
         setIsSuccess(true);
-        // Save JWT token in cookie for 7 days
         document.cookie = `auth_token=${data.token}; path=/; max-age=${60 * 60 * 24 * 7}`;
-
-        setTimeout(() => {
-          window.location.href = "/panel";
-        }, 1000);
+        setTimeout(() => { window.location.href = "/panel"; }, 1000);
       }
     } catch (err) {
       console.error("Login fetch error:", err);
@@ -46,37 +38,24 @@ export default function LoginPage() {
   };
 
   return (
-    <>
+    <div className="login-card">
       <h1>Admin Login</h1>
-
       <form className="login-form" onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          autoFocus
-          required
-          disabled={loading || isSuccess}
-        />
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          disabled={loading || isSuccess}
-        />
+        <input type="text" placeholder="Username" value={username}
+          onChange={(e) => setUsername(e.target.value)} autoFocus required
+          disabled={loading || isSuccess} />
+        <input type="password" placeholder="Password" value={password}
+          onChange={(e) => setPassword(e.target.value)} required
+          disabled={loading || isSuccess} />
         <button type="submit" disabled={loading || isSuccess}>
           {loading ? "Authenticating..." : "Login"}
         </button>
       </form>
-
       {message && (
         <div className={`api-msg ${isSuccess ? "success" : "error"}`}>
           {isSuccess ? "✅ " : "❌ "}{message}
         </div>
       )}
-    </>
+    </div>
   );
 }
