@@ -53,7 +53,11 @@ export default function UsersPage() {
                         <tr key={user.id}>
                             <td style={{ fontWeight: 700, color: 'var(--primary)' }}>{user.id}</td>
                             <td>{user.name || "—"}</td>
-                            <td><span className="badge badge-username">{user.username}</span></td>
+                            <td style={{ fontWeight: 700 }}>
+                                <Link href={`/user/${user.id}`} style={{ color: 'var(--primary)', textDecoration: 'none' }}>
+                                    {user.id}
+                                </Link>
+                            </td>
                             <td style={{ color: 'var(--muted)' }}>{user.email}</td>
                             <td style={{ textAlign: 'center' }}>
                                 <span className={`badge ${user.is_admin ? 'badge-admin' : 'badge-user'}`}>
