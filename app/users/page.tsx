@@ -26,9 +26,20 @@ export default function UsersPage() {
             .catch(() => { setError("Could not load users."); setLoading(false); });
     }, []);
 
-    const handleEdit = (id: number, name: string) => alert(`Edit ${name}`);
-    const handleDelete = (id: number, name: string) => {
-        if (window.confirm(`Delete ${name}?`)) alert(`Deleted ${id}`);
+    const handleDelete = async (id: number, name: string) => {
+        if (!window.confirm(`Are you sure you want to delete ${name}?`)) return;
+
+        const token = getCookie("auth_token");
+        try {
+            const res = await fetch(`/api/user/${id}`, {
+                method: "DELETE",
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            if (!res.ok) throw new Error("Failed");
+            setUsers(users.filter(u => u.id !== id));
+        } catch {
+            alert("Failed to delete user.");
+        }
     };
 
     if (loading) return <div className="wide-container"><p>Loading...</p></div>;
@@ -37,6 +48,7 @@ export default function UsersPage() {
     return (
         <div className="wide-container">
             <h1>Users Management</h1>
+
             <table className="data-table">
                 <thead>
                     <tr>
@@ -66,7 +78,8 @@ export default function UsersPage() {
                             </td>
                             <td style={{ textAlign: 'center' }}>
                                 <div style={{ display: 'flex', gap: '8px', justifyContent: 'center' }}>
-                                    <button className="btn" onClick={() => handleEdit(user.id, user.username)}>Edit</button>
+                                    {/* Changed to a Link */}
+                                    <Link href={`/user/${user.id}`} className="btn">Edit</Link>
                                     <button className="btn btn-danger" onClick={() => handleDelete(user.id, user.username)}>Delete</button>
                                 </div>
                             </td>
@@ -74,6 +87,7 @@ export default function UsersPage() {
                     ))}
                 </tbody>
             </table>
+
             <div style={{ textAlign: 'center', marginTop: '24px' }}>
                 <Link href="/panel" className="btn-primary">← Back to Panel</Link>
             </div>
