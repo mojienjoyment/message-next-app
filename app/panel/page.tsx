@@ -1,51 +1,62 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+"use client";
 
-// Prevent build-time prerendering so cookie is read fresh per request
-export const dynamic = 'force-dynamic';
+import { useState, useEffect } from "react";
 
-export default async function PanelPage() {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("auth_token")?.value;
+// Helper to read cookies in the browser
+function getCookie(name: string) {
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    return match ? match[2] : null;
+}
 
-    // 1. If no token exists, redirect to login immediately
-    if (!token) {
-        redirect("/");
-    }
+export default function PanelPage() {
+    const [user, setUser] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
 
-    // 2. Fetch user data from the internal Flask API using the token
-    // We use the internal 127.0.0.1:5001 URL to bypass proxy overhead during SSR
-    const res = await fetch("http://127.0.0.1:5001/user/me", {
-        method: "GET",
-        headers: {
-            "Authorization": `Bearer ${token}`
-        },
-        cache: "no-store" // Ensure we always get fresh data
-    });
+    useEffect(() => {
+        const token = getCookie("auth_token");
 
-    // 3. If the token is invalid, expired, or API fails, redirect to login
-    if (!res.ok) {
-        redirect("/");
-    }
+        // If no token, redirect to login immediately
+        if (!token) {
+            window.location.href = "/";
+            return;
+        }
 
-    const data = await res.json();
-    const user = data.user;
+        // This fetch now runs in the browser and will show in Burp!
+        fetch("/api/user/me", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        })
+            .then((res) => {
+                if (!res.ok) throw new Error("Unauthorized");
+                return res.json();
+            })
+            .then((data) => {
+                setUser(data.user);
+                setLoading(false);
+            })
+            .catch((err) => {
+                console.error("Fetch error:", err);
+                // If token is invalid/expired, redirect to login
+                window.location.href = "/";
+            });
+    }, []);
 
-    // 4. Server Action to handle secure logout
-    const handleLogout = async () => {
-        "use server";
-        const { cookies } = await import("next/headers");
-        const store = await cookies();
-        store.delete("auth_token");
-        redirect("/");
+    const handleLogout = () => {
+        // Delete cookie and redirect
+        document.cookie = "auth_token=; max-age=0; path=/";
+        window.location.href = "/";
     };
+
+    if (loading) return <p>Loading...</p>;
+    if (!user) return null;
 
     return (
         <>
             <h1>Dashboard</h1>
             <p className="welcome-text">Welcome, {user.username}!</p>
 
-            {/* User Information Card */}
             <div style={{
                 textAlign: "left",
                 background: "#f9fafb",
@@ -72,11 +83,9 @@ export default async function PanelPage() {
                 </p>
             </div>
 
-            <form action={handleLogout}>
-                <button type="submit" className="logout-btn">
-                    Logout
-                </button>
-            </form>
+            <button onClick={handleLogout} className="logout-btn">
+                Logout
+            </button>
         </>
     );
 }
