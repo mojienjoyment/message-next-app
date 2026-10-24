@@ -1,61 +1,56 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 
-export default function LoginPage() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [message, setMessage] = useState("");
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [loading, setLoading] = useState(false);
+function getCookie(name: string) {
+  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  return match ? match[2] : null;
+}
 
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setMessage("");
-    setIsSuccess(false);
-    setLoading(true);
+export default function PanelPage() {
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-    try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Accept": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-      const data = await res.json();
-      setMessage(data.msg || "Unknown response");
+  useEffect(() => {
+    const token = getCookie("auth_token");
+    if (!token) { window.location.href = "/"; return; }
 
-      if (data.status === 200 && data.token) {
-        setIsSuccess(true);
-        document.cookie = `auth_token=${data.token}; path=/; max-age=${60 * 60 * 24 * 7}`;
-        setTimeout(() => { window.location.href = "/panel"; }, 1000);
-      }
-    } catch (err) {
-      console.error("Login fetch error:", err);
-      setMessage("Network error. Please try again.");
-    } finally {
-      setLoading(false);
-    }
+    fetch("/api/user/me", {
+      method: "GET",
+      headers: { "Authorization": `Bearer ${token}` }
+    })
+      .then((res) => { if (!res.ok) throw new Error("Unauthorized"); return res.json(); })
+      .then((data) => { setUser(data.user); setLoading(false); })
+      .catch(() => { window.location.href = "/"; });
+  }, []);
+
+  const handleLogout = () => {
+    document.cookie = "auth_token=; max-age=0; path=/";
+    window.location.href = "/";
   };
 
+  if (loading) return <p>Loading...</p>;
+  if (!user) return null;
+
   return (
-    <div className="login-card">
-      <h1>Admin Login</h1>
-      <form className="login-form" onSubmit={handleSubmit}>
-        <input type="text" placeholder="Username" value={username}
-          onChange={(e) => setUsername(e.target.value)} autoFocus required
-          disabled={loading || isSuccess} />
-        <input type="password" placeholder="Password" value={password}
-          onChange={(e) => setPassword(e.target.value)} required
-          disabled={loading || isSuccess} />
-        <button type="submit" disabled={loading || isSuccess}>
-          {loading ? "Authenticating..." : "Login"}
-        </button>
-      </form>
-      {message && (
-        <div className={`api-msg ${isSuccess ? "success" : "error"}`}>
-          {isSuccess ? "✅ " : "❌ "}{message}
-        </div>
-      )}
+    <div className="dash-card">
+      <h1>Dashboard</h1>
+      <p style={{ fontSize: "1.1rem", color: "var(--muted)" }}>Welcome, {user.username}!</p>
+
+      <div className="info-card">
+        <p className="info-row"><span className="info-label">Username:</span> {user.username}</p>
+        <p className="info-row"><span className="info-label">Email:</span> {user.email}</p>
+      </div>
+
+      <ul className="nav-pills">
+        <li><Link href="/users">Users</Link></li>
+        <li><Link href="/server">Server</Link></li>
+        <li><Link href="/statistics">Statistics</Link></li>
+        <li><Link href="/invitation_codes">Invitation Codes</Link></li>
+      </ul>
+
+      <button onClick={handleLogout} className="logout-btn">Logout</button>
     </div>
   );
 }
